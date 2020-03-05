@@ -7,6 +7,7 @@
 #include "Eigen-3.3/Eigen/QR"
 #include "helpers.h"
 #include "json.hpp"
+#include "spline.h"
 
 // for convenience
 using nlohmann::json;
@@ -57,7 +58,7 @@ int main() {
   double ref_vel = 49.5;
 
   h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,
-               &map_waypoints_dx,&map_waypoints_dy]
+               &map_waypoints_dx,&map_waypoints_dy, &lane, &ref_vel]
               (uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
@@ -96,8 +97,8 @@ int main() {
 
           json msgJson;
 
-          vector<double> next_x_vals;
-          vector<double> next_y_vals;
+          //vector<double> next_x_vals;
+          //vector<double> next_y_vals;
 
           /**
            * TODO: define a path made up of (x,y) points that the car will visit
@@ -146,9 +147,9 @@ int main() {
           }
 
           // add evenly spaced points (30m) ahead of the starting reference
-          vector<double> nex_wp0 = getXY(car_s+30, 2+4*lane, map_waypoints_s, map_waypoints_x, map_waypoints_y);
-          vector<double> nex_wp1 = getXY(car_s+60, 2+4*lane, map_waypoints_s, map_waypoints_x, map_waypoints_y);
-          vector<double> nex_wp2 = getXY(car_s+90, 2+4*lane, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          vector<double> next_wp0 = getXY(car_s+30, 2+4*lane, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          vector<double> next_wp1 = getXY(car_s+60, 2+4*lane, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+          vector<double> next_wp2 = getXY(car_s+90, 2+4*lane, map_waypoints_s, map_waypoints_x, map_waypoints_y);
 
           ptsx.push_back(next_wp0[0]);
           ptsx.push_back(next_wp1[0]);
@@ -182,9 +183,9 @@ int main() {
           }
 
           // break up spline points for travelling at reference velocity
-          double target_x = 30.0
+          double target_x = 30.0;
           double target_y = s(target_x);
-          double target_dist = sqrt(target_x*target_x = target_y*target_y);
+          double target_dist = sqrt(target_x*target_x + target_y*target_y);
 
           double x_add_on = 0;
 
@@ -192,10 +193,13 @@ int main() {
           for (int i = 0; i <= 50-previous_path_x.size(); i++)
           {
             double N = target_dist / (0.02*ref_vel/2.24);
-            double x_points = x_add_on + target_x / N;
-            double y_points = s(x_point);
+            double x_point = x_add_on + target_x / N;
+            double y_point = s(x_point);
 
             x_add_on = x_point;
+
+            double x_ref = x_point;
+            double y_ref = y_point;
 
             // transformation
             x_point = x_ref * cos(ref_yaw) - y_ref * sin(ref_yaw);
