@@ -100,44 +100,83 @@ int main() {
           int prev_size = previous_path_x.size();
 
 
-          if (prev_size > 2)
+          if (prev_size > 0)
           {
             car_s = end_path_s;
           }
 
-          bool too_close = false;
+          bool car_ahead = false;
+          bool car_left = false;
+          bool car_right = false;
 
-          // loop over other cars
+          // loop over other cars and analyze their position
           for (int i = 0; i < sensor_fusion.size(); i++){
             float d = sensor_fusion[i][6];
 
-            // car in the front
-            if ((d < (2+4*lane+2)) && (d > (2+4*lane-2)))
-            {
-              double vx = sensor_fusion[i][3];
-              double vy = sensor_fusion[i][4];
-              double check_speed = sqrt(vx*vx+vy*vy);
-              double check_car_s = sensor_fusion[i][5];
+            int car_lane = -1;
 
-              check_car_s += ((double)prev_size*0.02*check_speed);
+            if (d > 0 && d < 4) {
+                car_lane = 0;
+            } else if (d > 4 && d < 8) {
+                car_lane = 1;
+            } else if (d > 8 && d < 12) {
+                car_lane = 2;
+            } else if (car_lane < 0) {
+                continue;
+            }
 
+            // Find car speed.
+            double vx = sensor_fusion[i][3];
+            double vy = sensor_fusion[i][4];
+            double check_speed = sqrt(vx*vx + vy*vy);
+            double check_car_s = sensor_fusion[i][5];
+
+            // Estimate car s position after executing previous trajectory
+            check_car_s += ((double)prev_size * 0.02 * check_speed);
+
+            // car in front of us
+            if (car_lane == lane) {
               // check if we are too close to the fron car
-              if ((check_car_s > car_s) && ((check_car_s - car_s) < 30))
-              {
-                  //ref_vel = 29.5;
-                  too_close = true;
-              }
+              car_ahead |= (check_car_s > car_s) && (check_car_s - car_s < 30);
+            } else if (car_lane == lane - 1){
+              // Car on the left
+              car_left |= (car_s - 30 < check_car_s) && (car_s + 30 > check_car_s);
+            } else if (car_lane = lane + 1) {
+              // Car on the right
+              car_right |= (car_s - 30 < check_car_s) && (car_s + 30 > check_car_s);
             }
           }
 
-
-          if (too_close)
-          {
-            ref_vel -= 0.224;
+          // Behavior : Let's see what to do.
+          double speed_diff = 0;
+          const double MAX_SPEED = 49.5;
+          const double MAX_ACC = .224;
+          if (car_ahead) { // Car ahead
+            if ( !car_left && lane > 0 ) {
+              // if there is no car left and there is a left lane.
+              lane--; // Change lane left.
+            } else if (!car_right && lane != 2){
+              // if there is no car right and there is a right lane.
+              lane++; // Change lane right.
+            } else {
+              speed_diff -= MAX_ACC;
+            }
+          } else {
+            if (lane != 1) { // if we are not on the center lane.
+              if ((lane == 0 && !car_right) || (lane == 2 && !car_left)) {
+                lane = 1; // Back to center.
+              }
+            }
+            if (ref_vel < MAX_SPEED) {
+              speed_diff += MAX_ACC;
+            }
           }
-          else if (ref_vel < 49.5)
-          {
-            ref_vel += 0.224;
+
+          ref_vel += speed_diff;
+          if ( ref_vel > MAX_SPEED ) {
+            ref_vel = MAX_SPEED;
+          } else if ( ref_vel < MAX_ACC ) {
+            ref_vel = MAX_ACC;
           }
 
           // create a list of widely and evenly spaced waypoints at 30m
