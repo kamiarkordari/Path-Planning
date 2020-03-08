@@ -55,7 +55,15 @@ The helper function `getXY`takes in Frenet (s,d) coordinates and transforms them
 ##### Interpolating Points
 To estimate the location of points between the known waypoints, we "interpolate" the position of those points using [spline tool](https://kluge.in-chemnitz.de/opensource/spline/) for C++, contained in just a single header file.
 
+##### Cost function
 
+In most situations, a single cost function will not be sufficient to produce complex vehicle behavior.
+
+The following are potential inputs to the cost function:
+
+- Target speed: The speed at which you would like the vehicle to travel
+- Intended lane: The intended lane for the given behavior e.g. one lane over from the current lane
+- A vector of lane speeds, based on traffic in that lane
 
 ### Sensor Fusion
 It's important that the car doesn't crash into any of the other vehicles on the road, all of which are moving at different speeds around the speed limit and can change lanes.
