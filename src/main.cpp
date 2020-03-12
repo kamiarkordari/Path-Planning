@@ -131,7 +131,7 @@ int main() {
             double check_speed = sqrt(vx*vx + vy*vy);
             double check_car_s = sensor_fusion[i][5];
 
-            // Estimate car s position after executing previous trajectory
+            // Estimate car's position after executing previous trajectory
             check_car_s += ((double)prev_size * 0.02 * check_speed);
 
             // car in front of us
