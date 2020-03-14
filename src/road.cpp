@@ -50,7 +50,7 @@ void Road::populate_traffic() {
 }
 
 void Road::advance() {
-  map<int ,vector<Vehicle> > predictions;
+  map<int, vector<Vehicle>> predictions;
 
   map<int, Vehicle>::iterator it = this->vehicles.begin();
 
