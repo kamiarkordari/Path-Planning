@@ -25,6 +25,8 @@ class Road {
 
   void add_ego(int lane_num, int s, std::vector<int> &config_data);
 
+  void add_vehicle(int lane_num, float s, float speed);
+
   void cull();
 
   // Road variables

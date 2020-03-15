@@ -173,6 +173,8 @@ int main() {
             // Estimate car's position after executing previous trajectory
             check_car_s += ((double)prev_size * 0.02 * check_speed);
 
+            road.add_vehicle(car_lane, check_car_s, check_speed);
+
             // car in front of us
             if (car_lane == lane) {
               // check if we are too close to the fron car

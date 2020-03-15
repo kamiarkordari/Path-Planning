@@ -26,6 +26,15 @@ Vehicle Road::get_ego() {
   return this->vehicles.find(this->ego_key)->second;
 }
 
+void Road::add_vehicle(int lane_num, float s, float speed) {
+  Vehicle vehicle = Vehicle(lane_num,s,speed,0);
+  vehicle.state = "CS";
+  this->vehicles_added += 1;
+  this->vehicles.insert(std::pair<int,Vehicle>(vehicles_added,vehicle));
+  vehicle_just_added = true;
+}
+
+
 void Road::populate_traffic() {
   int start_s = std::max(this->camera_center - (this->update_width/2), 0);
 
