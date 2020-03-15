@@ -40,9 +40,6 @@ int main() {
   //   -MAX_ACCEL and MAX_ACCEL
   int MAX_ACCEL = 2;
 
-
-  Road road = Road(SPEED_LIMIT, TRAFFIC_DENSITY, LANE_SPEEDS);
-
   // The max s value before wrapping around the track back to 0
   double max_s = 6945.554;
 
@@ -56,7 +53,6 @@ int main() {
   //   and max_acceleration
   int num_lanes = LANE_SPEEDS.size();
   vector<int> ego_config = {SPEED_LIMIT, num_lanes, goal_s, goal_lane, MAX_ACCEL};
-  road.add_ego(2, 0, ego_config);
 
   double max_s = 6945.554;
 
@@ -148,6 +144,13 @@ int main() {
           bool car_left = false;
           bool car_right = false;
 
+          ///// -------- NEW CODE ---------start
+          Road road = Road(SPEED_LIMIT, TRAFFIC_DENSITY, LANE_SPEEDS);
+          road.add_ego(lane, car_s, ego_config);
+
+          ///// -------- NEW CODE ---------end
+
+
           // loop over other cars and analyze their position
           for (int i = 0; i < sensor_fusion.size(); i++){
             float d = sensor_fusion[i][6];
@@ -175,6 +178,7 @@ int main() {
 
             road.add_vehicle(car_lane, check_car_s, check_speed);
 
+/*
             // car in front of us
             if (car_lane == lane) {
               // check if we are too close to the fron car
@@ -186,8 +190,18 @@ int main() {
               // Car on the right
               car_right |= (car_s - 30 < check_car_s) && (car_s + 30 > check_car_s);
             }
+*/
           }
 
+          ///// -------- NEW CODE ---------start
+          road.advance();
+
+          ref_vel = road.get_ego().v;
+          lane = road.get_ego().lane;
+
+          ///// -------- NEW CODE ---------end
+
+/*
           // Behavior : Let's see what to do.
           double speed_diff = 0;
           const double MAX_SPEED = 49.5;
@@ -219,6 +233,7 @@ int main() {
           } else if ( ref_vel < MAX_ACC ) {
             ref_vel = MAX_ACC;
           }
+*/
 
           // create a list of widely and evenly spaced waypoints at 30m
           vector<double> ptsx;
