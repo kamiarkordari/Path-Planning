@@ -26,39 +26,6 @@ int main() {
   vector<double> map_waypoints_dx;
   vector<double> map_waypoints_dy;
 
-  ///// -------- NEW CODE ---------start
-  // impacts default behavior for most states
-  int SPEED_LIMIT = 10;
-
-  // all traffic in lane (besides ego) follow these speeds
-  vector<int> LANE_SPEEDS = {SPEED_LIMIT,SPEED_LIMIT,SPEED_LIMIT};
-
-  // Number of available "cells" which should have traffic
-  double TRAFFIC_DENSITY = 0.15;
-
-  // At each timestep, ego can set acceleration to value between
-  //   -MAX_ACCEL and MAX_ACCEL
-  int MAX_ACCEL = 2;
-
-  // The max s value before wrapping around the track back to 0
-  double max_s = 6945.554;
-
-  // s value and lane number of goal.
-  vector<int> GOAL = {max_s, 0};
-
-  int goal_s = GOAL[0];
-  int goal_lane = GOAL[1];
-
-  // configuration data: speed limit, num_lanes, goal_s, goal_lane,
-  //   and max_acceleration
-  int num_lanes = LANE_SPEEDS.size();
-  vector<int> ego_config = {SPEED_LIMIT, num_lanes, goal_s, goal_lane, MAX_ACCEL};
-
-  double max_s = 6945.554;
-
-
-  ///// -------- NEW CODE ---------end
-
   // Waypoint map to read from
   string map_file_ = "../data/highway_map.csv";
   // The max s value before wrapping around the track back to 0
@@ -145,7 +112,29 @@ int main() {
           bool car_right = false;
 
           ///// -------- NEW CODE ---------start
-          Road road = Road(SPEED_LIMIT, TRAFFIC_DENSITY, LANE_SPEEDS);
+          // impacts default behavior for most states
+          int SPEED_LIMIT = 10;
+
+          // all traffic in lane (besides ego) follow these speeds
+          vector<int> LANE_SPEEDS = {SPEED_LIMIT,SPEED_LIMIT,SPEED_LIMIT};
+
+          // Number of available "cells" which should have traffic
+          double TRAFFIC_DENSITY = 0.15;
+
+          // At each timestep, ego can set acceleration to value between
+          //   -MAX_ACCEL and MAX_ACCEL
+          int MAX_ACCEL = 0.224;
+
+          // The max s value before wrapping around the track back to 0
+          //double max_s = 6945.554;
+          double max_s = 6945;
+
+          // configuration data: speed limit, num_lanes, goal_s, goal_lane,
+          //   and max_acceleration
+          int num_lanes = LANE_SPEEDS.size();
+          vector<int> ego_config = {SPEED_LIMIT, num_lanes, max_s, MAX_ACCEL};
+
+          Road road(SPEED_LIMIT, TRAFFIC_DENSITY, LANE_SPEEDS);
           road.add_ego(lane, car_s, ego_config);
 
           ///// -------- NEW CODE ---------end
