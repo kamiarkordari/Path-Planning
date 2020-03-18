@@ -9,23 +9,23 @@
 class Road {
  public:
   // Constructor
-  Road::Road(int speed_limit, double traffic_density, std::vector<int> &lane_speeds);
+  Road(int speed_limit, double traffic_density, std::vector<int> &lane_speeds);
 
   // Destructor
   virtual ~Road();
 
   // Road functions
-  Vehicle Road::get_ego();
+  Vehicle get_ego();
 
-  void Road::populate_traffic();
+  void populate_traffic();
 
-  void Road::advance();
+  void advance();
 
-  void Road::display(int timestep);
+  void display(int timestep);
 
-  void Road::add_ego(int lane_num, int s, std::vector<int> &config_data);
+  void add_ego(int lane_num, int s, std::vector<int> &config_data);
 
-  void Road::add_vehicle(int lane_num, float s, float speed);
+  void add_vehicle(int lane_num, float s, float speed);
 
   void cull();
 
