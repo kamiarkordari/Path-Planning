@@ -113,7 +113,7 @@ int main() {
 
           ///// -------- NEW CODE ---------start
           // impacts default behavior for most states
-          int SPEED_LIMIT = 10;
+          int SPEED_LIMIT = 49.5;
 
           // all traffic in lane (besides ego) follow these speeds
           vector<int> LANE_SPEEDS = {SPEED_LIMIT,SPEED_LIMIT,SPEED_LIMIT};
@@ -187,6 +187,12 @@ int main() {
 
           ref_vel = road.get_ego().v;
           lane = road.get_ego().lane;
+
+          if ( ref_vel > SPEED_LIMIT ) {
+            ref_vel = SPEED_LIMIT;
+          } else if ( ref_vel < MAX_ACC ) {
+            ref_vel += MAX_ACCEL;
+          }
 
           ///// -------- NEW CODE ---------end
 
