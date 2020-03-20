@@ -31,7 +31,7 @@ void Road::add_vehicle(int lane_num, float s, float speed) {
   vehicle.state = "CS";
   this->vehicles_added += 1;
   this->vehicles.insert(std::pair<int,Vehicle>(vehicles_added,vehicle));
-  vehicle_just_added = true;
+  //vehicle_just_added = true;
 }
 
 
@@ -65,7 +65,8 @@ void Road::advance() {
 
   while (it != this->vehicles.end()) {
     int v_id = it->first;
-    vector<Vehicle> preds = it->second.generate_predictions();
+    int horizon = 50;
+    vector<Vehicle> preds = it->second.generate_predictions(horizon);
     predictions[v_id] = preds;
     ++it;
   }

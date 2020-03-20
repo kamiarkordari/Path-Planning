@@ -67,7 +67,7 @@ class Vehicle {
 
   int preferred_buffer = 6; // impacts "keep lane" behavior.
 
-  int lane, s, goal_s, lanes_available;
+  int lane, s, goal_s, lanes_available, goal_lane;
 
   float v, target_speed, a, max_acceleration;
 

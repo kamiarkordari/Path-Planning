@@ -4,31 +4,31 @@ The goal of this project is to build a path planner that creates smooth and safe
 ### Goals
 In this project the goal is to safely navigate around a virtual highway with other traffic that is driving +-10 MPH of the 50 MPH speed limit. The planner is provided with the car's localization and sensor fusion data, there is also a sparse map list of waypoints around the highway. The car should try to go as close as possible to the 50 MPH speed limit, which means passing slower traffic when possible. Other cars will try to change lanes too. The car should avoid hitting other cars at all cost as well as driving inside of the marked road lanes at all times, unless going from one lane to another. The car should be able to make one complete loop around the 6946m highway. Since the car is trying to go 50 MPH, it should take a little over 5 minutes to complete 1 loop. Also the car should not experience total acceleration over 10 m/s^2 and jerk that is greater than 10 m/s^3.
 
-## Details
-
-1. The car uses a perfect controller and will visit every (x,y) point it recieves in the list every .02 seconds. The units for the (x,y) points are in meters and the spacing of the points determines the speed of the car. The vector going from a point to the next point in the list dictates the angle of the car. Acceleration both in the tangential and normal directions is measured along with the jerk, the rate of change of total Acceleration. The (x,y) point paths that the planner recieves should not have a total acceleration that goes over 10 m/s^2, also the jerk should not go over 50 m/s^3.
-
-2. There will be some latency between the simulator running and the path planner returning a path, with optimized code usually its not very long maybe just 1-3 time steps. During this delay the simulator will continue using points that it was last given, because of this its a good idea to store the last points you have used so you can have a smooth transition. previous_path_x, and previous_path_y can be helpful for this transition since they show the last points given to the simulator controller with the processed points already removed. You would either return a path that extends this previous path or make sure to create a new path that has a smooth transition with this last path.
-
 ### Path planner
 
-##### Point Paths
-The path planner outputs a list of x and y global map coordinates. Each pair of x and y coordinates is a point, and all of the points together form a trajectory.
+##### Trajectory
+The path planner outputs a list of x and y global map coordinates to the controller. Each pair of x and y coordinates is a point, and all of the points together form a trajectory.
+
+The units for the (x,y) points are in meters.
 
 Every 20 ms the car moves to the next point on the list. The car's new rotation becomes the line between the previous waypoint and the car's new location.
 
-In `main.cpp`, we pass next_x_vals, and next_y_vals that contains the point of the trajectory to the simulator.
+In `main.cpp`, we pass `next_x_vals`, and `next_y_vals` that contains the point of the trajectory to the simulator.
+
+The path planner builds a 50-point path. At each new calculation cycle, the code starts the new path with whatever waypoints from the previous path. Then it appends new waypoints based on new data from the car's sensor fusion information until the new path has 50 total waypoints. This ensures that there is a smooth transition from cycle to cycle.
+
+
+##### Latency
+There will be some latency between the simulator running and the path planner returning a path, with optimized code usually its not very long maybe just 1-3 time steps. During this delay the simulator will continue using points that it was last given, because of this its a good idea to store the last used points to have a smooth transition. `previous_path_x`, and `previous_path_y` can be helpful for this transition since they show the last points given to the simulator controller with the processed points already removed. Path planner should either return a path that extends this previous path or make sure to create a new path that has a smooth transition with this last path.
+
 
 ##### Velocity
 The velocity of the car depends on the spacing of the points. Because the car moves to a new waypoint every 20ms, the larger the spacing between points, the faster the car will travel. The speed goal is to have the car traveling at (but not above) the 50 MPH speed limit as often as possible.
 
 ##### Jerk
-The jerk is calculated as the average acceleration over 1 second intervals. In order for the passenger to have an enjoyable ride both the jerk and the total acceleration should not exceed 10 m/s^2.
+The jerk is calculated as the average acceleration over 1 second intervals. In order for the passenger to have an enjoyable ride the total acceleration should not go over 10 m/s^2, also the jerk should not go over 50 m/s^3..
 
 We minimize total acceleration and jerk by gradually increasing and decreasing point path spacing based on the `car_speed` variable.
-
-### Creating paths
-The path planner builds a 50 poin path. At each new calculation cycle, the code starts the new path with whatever waypoints from the previous path. Then it appends new waypoints based on new data from the car's sensor fusion information until the new path has 50 total waypoints. This ensures that there is a smooth transition from cycle to cycle.
 
 ##### Timing
 The simulator runs a cycle every 20 ms (50 frames per second). The car will keep moving along the last path given by the path planning code while it waits for a new generated path. The new generated path takes into account the most up-to-date state of the traffic and location of other cars.
@@ -43,20 +43,18 @@ The track is 6945.554 meters around (about 4.32 miles). At 50 MPH, then it takes
 The highway has 6 lanes total - 3 heading in each direction. Each lane is 4 meters wide and the car should only ever be in one of the 3 lanes on the right-hand side. The car should always be inside a lane unless doing a lane change.
 
 ##### Localization
-Each waypoint has an (x,y) global map position, and a Frenet s value and Frenet d unit normal vector (split up into the x component, and the y component).
+Each waypoint has an `(x,y)` global map position, and a Frenet `s` value and Frenet `d` unit normal vector.
 
 The s value is the distance along the direction of the road. The first waypoint has an s value of 0 because it is the starting point.
 
 The d vector has a magnitude of 1 and points perpendicular to the road in the direction of the right-hand side of the road. The d vector can be used to calculate lane positions. For example, since the lane is 4 m wide, the middle of the left lane (the lane closest to the double-yellow dividing line) is 2 m from the waypoint.
 
-##### Converting Frenet Coordinates
-The helper function `getXY`takes in Frenet (s,d) coordinates and transforms them to (x,y) coordinates.
+The helper function `getXY` takes in Frenet (s,d) coordinates and transforms them to (x,y) coordinates.
 
 ##### Interpolating Points
 To estimate the location of points between the known waypoints, we "interpolate" the position of those points using [spline tool](https://kluge.in-chemnitz.de/opensource/spline/) for C++, contained in just a single header file.
 
 ##### Cost function
-
 In most situations, a single cost function will not be sufficient to produce complex vehicle behavior.
 
 The following are potential inputs to the cost function:

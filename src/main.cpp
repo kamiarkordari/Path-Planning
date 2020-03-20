@@ -127,12 +127,12 @@ int main() {
 
           // The max s value before wrapping around the track back to 0
           //double max_s = 6945.554;
-          double max_s = 6945;
+          double MAX_S = 6945;
 
           // configuration data: speed limit, num_lanes, goal_s, goal_lane,
           //   and max_acceleration
           int num_lanes = LANE_SPEEDS.size();
-          vector<int> ego_config = {SPEED_LIMIT, num_lanes, max_s, MAX_ACCEL};
+          vector<int> ego_config = {SPEED_LIMIT, num_lanes, MAX_S, MAX_ACCEL};
 
           Road road(SPEED_LIMIT, TRAFFIC_DENSITY, LANE_SPEEDS);
           road.add_ego(lane, car_s, ego_config);
@@ -165,9 +165,9 @@ int main() {
             // Estimate car's position after executing previous trajectory
             check_car_s += ((double)prev_size * 0.02 * check_speed);
 
-            road.add_vehicle(car_lane, check_car_s, check_speed);
+//            road.add_vehicle(car_lane, check_car_s, check_speed);
 
-/*
+//*//
             // car in front of us
             if (car_lane == lane) {
               // check if we are too close to the fron car
@@ -179,24 +179,26 @@ int main() {
               // Car on the right
               car_right |= (car_s - 30 < check_car_s) && (car_s + 30 > check_car_s);
             }
-*/
+//*//
           }
 
           ///// -------- NEW CODE ---------start
-          road.advance();
+//          road.advance();
 
-          ref_vel = road.get_ego().v;
-          lane = road.get_ego().lane;
-
-          if ( ref_vel > SPEED_LIMIT ) {
-            ref_vel = SPEED_LIMIT;
-          } else if ( ref_vel < MAX_ACC ) {
-            ref_vel += MAX_ACCEL;
-          }
-
-          ///// -------- NEW CODE ---------end
+//          ref_vel = road.get_ego().v;
+//          lane = road.get_ego().lane;
 
 /*
+          if ( ref_vel > SPEED_LIMIT ) {
+            ref_vel = SPEED_LIMIT;
+          //} else if ( ref_vel < MAX_ACC ) {
+          } else {
+            ref_vel += MAX_ACCEL;
+          }
+*/
+          ///// -------- NEW CODE ---------end
+
+//*//
           // Behavior : Let's see what to do.
           double speed_diff = 0;
           const double MAX_SPEED = 49.5;
@@ -228,7 +230,7 @@ int main() {
           } else if ( ref_vel < MAX_ACC ) {
             ref_vel = MAX_ACC;
           }
-*/
+//*/
 
           // create a list of widely and evenly spaced waypoints at 30m
           vector<double> ptsx;
