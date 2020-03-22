@@ -25,8 +25,6 @@ int main() {
 
   // Waypoint map to read from
   string map_file_ = "../data/highway_map.csv";
-  // The max s value before wrapping around the track back to 0
-// double max_s = 6945.554;
 
   std::ifstream in_map_(map_file_.c_str(), std::ifstream::in);
 
@@ -98,7 +96,6 @@ int main() {
 
           int prev_size = previous_path_x.size();
 
-
           if (prev_size > 0)
           {
             car_s = end_path_s;
@@ -150,20 +147,20 @@ int main() {
           double speed_diff = 0;
           const double MAX_SPEED = 49.5;
           const double MAX_ACC = .224;
-          if (car_ahead) { // Car ahead
+          if (car_ahead) { // car ahead
             if ( !car_left && lane > 0 ) {
               // if there is no car left and there is a left lane
               lane--; // Change lane left
             } else if (!car_right && lane != 2){
               // if there is no car right and there is a right lane
-              lane++; // Change lane right
+              lane++; // change lane right
             } else {
               speed_diff -= MAX_ACC;
             }
           } else {
             if (lane != 1) { // if we are not on the center lane.
               if ((lane == 0 && !car_right) || (lane == 2 && !car_left)) {
-                lane = 1; // Back to center.
+                lane = 1; // back to center
               }
             }
             if (ref_vel < MAX_SPEED) {
