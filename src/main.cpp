@@ -8,10 +8,7 @@
 #include "helpers.h"
 #include "json.hpp"
 #include "spline.h"
-#include "road.h"
-#include "vehicle.h"
 
-// for convenience
 using nlohmann::json;
 using std::string;
 using std::vector;
@@ -111,35 +108,6 @@ int main() {
           bool car_left = false;
           bool car_right = false;
 
-          ///// -------- NEW CODE ---------start
-          // impacts default behavior for most states
-          int SPEED_LIMIT = 49.5;
-
-          // all traffic in lane (besides ego) follow these speeds
-          vector<int> LANE_SPEEDS = {SPEED_LIMIT,SPEED_LIMIT,SPEED_LIMIT};
-
-          // Number of available "cells" which should have traffic
-          double TRAFFIC_DENSITY = 0.15;
-
-          // At each timestep, ego can set acceleration to value between
-          //   -MAX_ACCEL and MAX_ACCEL
-          int MAX_ACCEL = 0.224;
-
-          // The max s value before wrapping around the track back to 0
-          //double max_s = 6945.554;
-          double MAX_S = 6945;
-
-          // configuration data: speed limit, num_lanes, goal_s, goal_lane,
-          //   and max_acceleration
-          int num_lanes = LANE_SPEEDS.size();
-          vector<int> ego_config = {SPEED_LIMIT, num_lanes, MAX_S, MAX_ACCEL};
-
-          Road road(SPEED_LIMIT, TRAFFIC_DENSITY, LANE_SPEEDS);
-          road.add_ego(lane, car_s, ego_config);
-
-          ///// -------- NEW CODE ---------end
-
-
           // loop over other cars and analyze their position
           for (int i = 0; i < sensor_fusion.size(); i++){
             float d = sensor_fusion[i][6];
@@ -165,9 +133,6 @@ int main() {
             // Estimate car's position after executing previous trajectory
             check_car_s += ((double)prev_size * 0.02 * check_speed);
 
-//            road.add_vehicle(car_lane, check_car_s, check_speed);
-
-//*//
             // car in front of us
             if (car_lane == lane) {
               // check if we are too close to the fron car
@@ -179,37 +144,19 @@ int main() {
               // Car on the right
               car_right |= (car_s - 30 < check_car_s) && (car_s + 30 > check_car_s);
             }
-//*//
           }
 
-          ///// -------- NEW CODE ---------start
-//          road.advance();
-
-//          ref_vel = road.get_ego().v;
-//          lane = road.get_ego().lane;
-
-/*
-          if ( ref_vel > SPEED_LIMIT ) {
-            ref_vel = SPEED_LIMIT;
-          //} else if ( ref_vel < MAX_ACC ) {
-          } else {
-            ref_vel += MAX_ACCEL;
-          }
-*/
-          ///// -------- NEW CODE ---------end
-
-//*//
           // Behavior : Let's see what to do.
           double speed_diff = 0;
           const double MAX_SPEED = 49.5;
           const double MAX_ACC = .224;
           if (car_ahead) { // Car ahead
             if ( !car_left && lane > 0 ) {
-              // if there is no car left and there is a left lane.
-              lane--; // Change lane left.
+              // if there is no car left and there is a left lane
+              lane--; // Change lane left
             } else if (!car_right && lane != 2){
-              // if there is no car right and there is a right lane.
-              lane++; // Change lane right.
+              // if there is no car right and there is a right lane
+              lane++; // Change lane right
             } else {
               speed_diff -= MAX_ACC;
             }
@@ -227,10 +174,7 @@ int main() {
           ref_vel += speed_diff;
           if ( ref_vel > MAX_SPEED ) {
             ref_vel = MAX_SPEED;
-          } else if ( ref_vel < MAX_ACC ) {
-            ref_vel = MAX_ACC;
           }
-//*/
 
           // create a list of widely and evenly spaced waypoints at 30m
           vector<double> ptsx;
