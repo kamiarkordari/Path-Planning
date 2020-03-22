@@ -1,3 +1,7 @@
+[result]: ./images/result.gif "Short Gif"
+![result]
+
+
 #  Path Planning Project
 The goal of this project is to build a path planner that creates smooth and safe trajectories for a self-driving car to follow.
 
@@ -49,46 +53,35 @@ The s value is the distance along the direction of the road. The first waypoint 
 
 The d vector has a magnitude of 1 and points perpendicular to the road in the direction of the right-hand side of the road. The d vector can be used to calculate lane positions. For example, since the lane is 4 m wide, the middle of the left lane (the lane closest to the double-yellow dividing line) is 2 m from the waypoint.
 
-The helper function `getXY` takes in Frenet (s,d) coordinates and transforms them to (x,y) coordinates.
+The helper function `getXY` takes in Frenet `(s,d)` coordinates and transforms them to `(x,y)` coordinates.
 
 ##### Interpolating Points
 To estimate the location of points between the known waypoints, we "interpolate" the position of those points using [spline tool](https://kluge.in-chemnitz.de/opensource/spline/) for C++, contained in just a single header file.
 
-##### Cost function
-In most situations, a single cost function will not be sufficient to produce complex vehicle behavior.
 
-The following are potential inputs to the cost function:
-
-- Target speed: The speed at which you would like the vehicle to travel
-- Intended lane: The intended lane for the given behavior e.g. one lane over from the current lane
-- A vector of lane speeds, based on traffic in that lane
-
-### Sensor Fusion
+##### Sensor Fusion
 It's important that the car doesn't crash into any of the other vehicles on the road, all of which are moving at different speeds around the speed limit and can change lanes.
 
-The `sensor_fusion` variable contains all the information about the cars on the right-hand side of the road.
+The `sensor_fusion` variable contains all the information about the cars on the road.
 
-The data format for each car is: `[id, x, y, vx, vy, s, d]`. The id is a unique identifier for that car. The x, y values are in global map coordinates, and the vx, vy values are the velocity components, also in reference to the global map. Finally s and d are the Frenet coordinates for that car.
+The data format for each car is: `[id, x, y, vx, vy, s, d]`. The id is a unique identifier for that car. The `x`, `y` values are in global map coordinates, and the `vx`, `vy` values are the velocity components, also in reference to the global map. Finally `s` and `d` are the Frenet coordinates for that car.
 
 ##### Changing Lanes
-Any time the car approaches another car in front of it that is moving slower than the speed limit, the car should consider changing lanes.
+Any time the car approaches another car in front of it that is moving slower than the speed limit, it slows down and considers changing lanes.
 
-The car should only change lanes if such a change would be safe, and also if the lane change would help it move through the flow of traffic better.
+The car only change lanes if such a change would be safe, and also if the lane change would help it move through the flow of traffic better.
 
-For safety, a lane change path should optimize the distance away from other traffic. For comfort, a lane change path should also result in low acceleration and jerk.
+### Result
+See a video of the final result by clicking on the image below.
+
+[image-final-result]: ./images/screen_shot.jpg "Final Video Screenshot"
+
+[![image-final-result]](https://www.youtube.com/watch?v=BIqywLi8dC0&feature=youtu.be)
 
 
-
-#### Simulator.
-The simulator can be downloaded [here](https://github.com/udacity/self-driving-car-sim/releases/tag/T3_v1.2).  
-
-
-#### The map of the highway is in data/highway_map.txt
-Each waypoint in the list contains  [x,y,s,dx,dy] values. x and y are the waypoint's map coordinate position, the s value is the distance along the road to get to that waypoint in meters, the dx and dy values define the unit normal vector pointing outward of the highway loop.
-
-The highway's waypoints loop around so the frenet s value, distance along the road, goes from 0 to 6945.554.
-
-## Basic Build Instructions
+---
+### Basic Build Instructions
+---
 
 1. Clone this repo.
 2. Make a build directory: `mkdir build && cd build`
@@ -130,7 +123,6 @@ the path has processed since last time.
 
 ["sensor_fusion"] A 2d vector of cars and then that car's [car's unique ID, car's x position in map coordinates, car's y position in map coordinates, car's x velocity in m/s, car's y velocity in m/s, car's s position in frenet coordinates, car's d position in frenet coordinates.
 
-
 ## Dependencies
 
 * cmake >= 3.5
@@ -151,3 +143,6 @@ the path has processed since last time.
     cd uWebSockets
     git checkout e94b6e1
     ```
+
+### Simulator.
+The simulator can be downloaded [here](https://github.com/udacity/self-driving-car-sim/releases/tag/T3_v1.2).  
