@@ -8,6 +8,7 @@
 #include "helpers.h"
 #include "json.hpp"
 #include "spline.h"
+#include "vehicle.h"
 
 using nlohmann::json;
 using std::string;
@@ -88,8 +89,7 @@ int main() {
           double end_path_s = j[1]["end_path_s"];
           double end_path_d = j[1]["end_path_d"];
 
-          // Sensor Fusion Data, a list of all other cars on the same side
-          //   of the road.
+          // Sensor Fusion Data, a list of all other cars on the same side of the road.
           auto sensor_fusion = j[1]["sensor_fusion"];
 
           json msgJson;
@@ -105,45 +105,30 @@ int main() {
           bool car_left = false;
           bool car_right = false;
 
-          // loop over other cars and analyze their position
+          Vehicle ego_car(lane, car_s, car_speed, "CS");
+
+
+          // loop over other cars
           for (int i = 0; i < sensor_fusion.size(); i++){
-            float d = sensor_fusion[i][6];
+            double other_car_vx = sensor_fusion[i][3];
+            double other_car_vy = sensor_fusion[i][4];
+            double other_car_s = sensor_fusion[i][5];
+            float other_car_d = sensor_fusion[i][6];
 
-            int car_lane = -1;
+            int other_car_lane = get_lane(other_car_d,4);
+            double other_car_speed = sqrt(other_car_vx*other_car_vx + other_car_vy*other_car_vy);
 
-            if (d > 0 && d < 4) {
-                car_lane = 0;
-            } else if (d > 4 && d < 8) {
-                car_lane = 1;
-            } else if (d > 8 && d < 12) {
-                car_lane = 2;
-            } else if (car_lane < 0) {
-                continue;
-            }
+            // position after executing previous trajectory
+            other_car_s += ((double)prev_size * 0.02 * other_car_speed);
 
-            // Find car speed.
-            double vx = sensor_fusion[i][3];
-            double vy = sensor_fusion[i][4];
-            double check_speed = sqrt(vx*vx + vy*vy);
-            double check_car_s = sensor_fusion[i][5];
+            Vehicle car(other_car_lane, other_car_s, other_car_speed, "CS");
 
-            // Estimate car's position after executing previous trajectory
-            check_car_s += ((double)prev_size * 0.02 * check_speed);
+            check_lanes(car);
 
-            // car in front of us
-            if (car_lane == lane) {
-              // check if we are too close to the fron car
-              car_ahead |= (check_car_s > car_s) && (check_car_s - car_s < 30);
-            } else if (car_lane == lane - 1){
-              // Car on the left
-              car_left |= (car_s - 30 < check_car_s) && (car_s + 30 > check_car_s);
-            } else if (car_lane = lane + 1) {
-              // Car on the right
-              car_right |= (car_s - 30 < check_car_s) && (car_s + 30 > check_car_s);
-            }
           }
 
-          // Behavior : Let's see what to do.
+          choose_next_lane(Vehicle ego_car);
+
           double speed_diff = 0;
           const double MAX_SPEED = 49.5;
           const double MAX_ACC = .224;
