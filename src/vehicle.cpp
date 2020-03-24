@@ -42,12 +42,10 @@ void Vehicle::check_lanes(Vehicle car) {
     car_left_ahead = (distance < car.MIN_SAFE_DISTANCE) && (distance > 0);
     car_left_ahead_speed = car.speed;
     car_left_behind = (distance > -car.MIN_SAFE_DISTANCE) && (distance < 0);
-    car_left_behind_speed = car.speed;
   } else if (lane == car.lane - 1) {
     car_right_ahead = (distance < car.MIN_SAFE_DISTANCE) && (distance > 0);
     car_right_ahead_speed = car.speed;
     car_right_behind = (distance > -car.MIN_SAFE_DISTANCE) && (distance < 0);
-    car_right_behind_speed = car.speed;
   }
 }
 
@@ -82,7 +80,7 @@ float cost_state(state) {
     if ((d==0) || car_left_behind || car_left_ahead) {
       return 1;
     } else {
-      lane_speed = 
+      lane_speed =
     }
   } else if (state == "CLR") {
     if ((d==2) || car_right_behind || car_right_ahead) return 1;
