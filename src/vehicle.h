@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 
-using std::map;
 using std::string;
 using std::vector;
 
@@ -14,13 +13,11 @@ class Vehicle {
   Vehicle();
   Vehicle(int lane, float s, float v, string state="CS");
 
-  int get_lane(float d, float lane_width);
-
   void check_lanes(Vehicle car);
 
-  int choose_next_lane(Vehicle ego_car);
+  double choose_next_lane(double ref_vel);
 
-  float cost_lane(lane);
+  //float cost_state(string state);
 
   // Destructor
   virtual ~Vehicle();
@@ -32,7 +29,9 @@ class Vehicle {
   int lane;
   float s, d, speed, acceleration;
   string state;
-  bool car_ahead, car_left_ahead, car_left_behind, car_right_ahead, car_right_behind;
+  //bool car_ahead, car_left_ahead, car_left_behind, car_right_ahead, car_right_behind;
+  //float car_ahead_speed, car_left_ahead_speed, car_left_behind_speed, car_right_ahead_speed, car_right_behind_speed;
+  bool car_ahead, car_right, car_left;
   float car_ahead_speed, car_left_ahead_speed, car_left_behind_speed, car_right_ahead_speed, car_right_behind_speed;
 };
 

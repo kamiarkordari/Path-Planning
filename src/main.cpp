@@ -101,12 +101,8 @@ int main() {
             car_s = end_path_s;
           }
 
-          bool car_ahead = false;
-          bool car_left = false;
-          bool car_right = false;
 
           Vehicle ego_car(lane, car_s, car_speed, "CS");
-
 
           // loop over other cars
           for (int i = 0; i < sensor_fusion.size(); i++){
@@ -123,40 +119,19 @@ int main() {
 
             Vehicle car(other_car_lane, other_car_s, other_car_speed, "CS");
 
-            check_lanes(car);
+            ego_car.check_lanes(car);
 
           }
 
-          choose_next_lane(Vehicle ego_car);
+          ref_vel = ego_car.choose_next_lane(ref_vel);
 
-          double speed_diff = 0;
-          const double MAX_SPEED = 49.5;
-          const double MAX_ACC = .224;
-          if (car_ahead) { // car ahead
-            if ( !car_left && lane > 0 ) {
-              // if there is no car left and there is a left lane
-              lane--; // Change lane left
-            } else if (!car_right && lane != 2){
-              // if there is no car right and there is a right lane
-              lane++; // change lane right
-            } else {
-              speed_diff -= MAX_ACC;
-            }
-          } else {
-            if (lane != 1) { // if we are not on the center lane.
-              if ((lane == 0 && !car_right) || (lane == 2 && !car_left)) {
-                lane = 1; // back to center
-              }
-            }
-            if (ref_vel < MAX_SPEED) {
-              speed_diff += MAX_ACC;
-            }
-          }
+          //ref_vel += ego_car.acceleration;
+          //ref_vel += speed_diff;
+          //if (ref_vel > ego_car.MAX_SPEED ) {
+          //  ref_vel = ego_car.MAX_SPEED;
+          //}
 
-          ref_vel += speed_diff;
-          if ( ref_vel > MAX_SPEED ) {
-            ref_vel = MAX_SPEED;
-          }
+          lane = ego_car.lane;
 
           // create a list of widely and evenly spaced waypoints at 30m
           vector<double> ptsx;
@@ -245,6 +220,7 @@ int main() {
           for (int i = 0; i <= 50-previous_path_x.size(); i++)
           {
             double N = target_dist / (0.02*ref_vel/2.24);
+            //double N = target_dist / (0.02*ego_car.speed/2.24);
             double x_point = x_add_on + target_x / N;
             double y_point = s(x_point);
 
