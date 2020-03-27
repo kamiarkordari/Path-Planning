@@ -10,18 +10,18 @@ using std::vector;
 Vehicle::Vehicle(){}
 
 Vehicle::Vehicle(int lane, float s, float v, string state) {
-  lane = lane;
-  s = s;
-  speed = speed;
-  acceleration = 0;
-  state = state;
-  car_ahead = false;
+  this->lane = lane;
+  this->s = s;
+  this->speed = speed;
+  this->acceleration = 0;
+  this->state = state;
+  this->car_ahead = false;
   //car_left_ahead = false;
   //car_left_behind = false;
   //car_right_ahead = false;
   //car_right_behind = false;
-  car_left = false;
-  car_right = false;
+  this->car_left = false;
+  this->car_right = false;
 }
 
 Vehicle::~Vehicle() {}
@@ -50,6 +50,19 @@ void Vehicle::check_lanes(Vehicle car) {
   }
 */
 
+
+  if (car.lane == this->lane) {
+    // check if we are too close to the fron car
+    this->car_ahead |= (car.s > this->s) && (car.s - this->s < 30);
+  } else if (car.lane == this->lane - 1){
+    // Car on the left
+    this->car_left |= (this->s - 30 < car.s) && (this->s + 30 > car.s);
+  } else if (car.lane = this->lane + 1) {
+    // Car on the right
+    this->car_right |= (this->s - 30 < car.s) && (this->s + 30 > car.s);
+  }
+
+/*
   if (lane == car.lane) {
     car_ahead = distance < car.MIN_SAFE_DISTANCE && distance > 0;
   } else if (lane == car.lane + 1) {
@@ -57,7 +70,7 @@ void Vehicle::check_lanes(Vehicle car) {
   } else if (lane == car.lane - 1) {
     car_right = (distance < car.MIN_SAFE_DISTANCE) && (distance > 0);
   }
-
+*/
 }
 
 double Vehicle::choose_next_lane(double ref_vel) {
