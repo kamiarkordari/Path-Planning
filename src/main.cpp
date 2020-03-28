@@ -125,62 +125,9 @@ int main() {
 
             ego_car.check_lanes(car);
 
-            // car in front of us
-            //lane = eco_car.lane;
-/*
-            if (other_car_lane == lane) {
-              // check if we are too close to the fron car
-              car_ahead |= (other_car_s > car_s) && (other_car_s - car_s < 30);
-            } else if (other_car_lane == lane - 1){
-              // Car on the left
-              car_left |= (car_s - 30 < other_car_s) && (car_s + 30 > other_car_s);
-            } else if (other_car_lane = lane + 1) {
-              // Car on the right
-              car_right |= (car_s - 30 < other_car_s) && (car_s + 30 > other_car_s);
-            }
-*/
           }
-
-/*
-          double speed_diff = 0;
-          const double MAX_SPEED = 49.5;
-          const double MAX_ACC = .224;
-
-          if ( car_ahead ) { // Car ahead
-            if ( !car_left && lane > 0 ) {
-              // if there is no car left and there is a left lane.
-              lane--; // Change lane left.
-            } else if ( !car_right && lane != 2 ){
-              // if there is no car right and there is a right lane.
-              lane++; // Change lane right.
-            } else {
-              speed_diff -= MAX_ACC;
-            }
-          } else {
-            if ( lane != 1 ) { // if we are not on the center lane.
-              if ( ( lane == 0 && !car_right ) || ( lane == 2 && !car_left ) ) {
-                lane = 1; // Back to center.
-              }
-            }
-            if ( ref_vel < MAX_SPEED ) {
-              speed_diff += MAX_ACC;
-            }
-          }
-
-          ref_vel += speed_diff;
-          if ( ref_vel > MAX_SPEED ) {
-            ref_vel = MAX_SPEED;
-          }
-*/
-
 
           ref_vel = ego_car.choose_next_lane(ref_vel);
-
-          ref_vel += ego_car.acceleration;
-          ref_vel += speed_diff;
-          if (ref_vel > ego_car.MAX_SPEED ) {
-            ref_vel = ego_car.MAX_SPEED;
-          }
 
           lane = ego_car.lane;
 
