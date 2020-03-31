@@ -53,13 +53,14 @@ void Vehicle::check_lanes(Vehicle car) {
 
   if (car.lane == this->lane) {
     // check if we are too close to the fron car
-    this->car_ahead = distance < 2*car.MIN_SAFE_DISTANCE && distance > 0; //(car.s > this->s) && (car.s - this->s < 30);
+    this->car_ahead |= (car.s > this->s) && (car.s - this->s < 30);
+    //this->car_ahead = distance < 2*car.MIN_SAFE_DISTANCE && distance > 0; //(car.s > this->s) && (car.s - this->s < 30);
   } else if (car.lane == this->lane - 1){
     // Car on the left
-    this->car_left = (distance < car.MIN_SAFE_DISTANCE) && (distance > -car.MIN_SAFE_DISTANCE); //(this->s - 30 < car.s) && (this->s + 30 > car.s);
+    this->car_left |= (distance < car.MIN_SAFE_DISTANCE) && (distance > -car.MIN_SAFE_DISTANCE); //(this->s - 30 < car.s) && (this->s + 30 > car.s);
   } else if (car.lane = this->lane + 1) {
     // Car on the right
-    this->car_right = (distance < car.MIN_SAFE_DISTANCE) && (distance > -car.MIN_SAFE_DISTANCE); //(this->s - 30 < car.s) && (this->s + 30 > car.s);
+    this->car_right |= (distance < car.MIN_SAFE_DISTANCE) && (distance > -car.MIN_SAFE_DISTANCE); //(this->s - 30 < car.s) && (this->s + 30 > car.s);
   }
 
 /*
@@ -99,34 +100,39 @@ double Vehicle::choose_next_lane(double ref_vel) {
     }
   }
 */
-  double speed_diff = 0;
+  //double speed_diff = 0;
   const double MAX_SPEED = 49.5;
   const double MAX_ACC = 0.224;
 
+  //this->acceleration  = 0;
+
   if (this->car_ahead ) { // Car ahead
-    if ( !this->car_left && this->lane > 0 ) {
+    if (!this->car_left && this->lane > 0) {
       // if there is no car left and there is a left lane.
       this->lane--; // Change lane left.
-    } else if ( !this->car_right && this->lane != 2 ){
+    } else if (!this->car_right && this->lane != 2){
       // if there is no car right and there is a right lane.
       this->lane++; // Change lane right.
     } else {
-      speed_diff -= MAX_ACC;
+      //speed_diff -= MAX_ACC;
+      this->acceleration -= MAX_ACC;
     }
   } else {
-    if (this->lane != 1 ) { // if we are not on the center lane.
-      if ( (this->lane == 0 && !this->car_right ) || (this->lane == 2 && !this->car_left ) ) {
+    if (this->lane != 1) { // if we are not on the center lane.
+      if ((this->lane == 0 && !this->car_right) || (this->lane == 2 && !this->car_left)) {
         this->lane = 1; // Back to center.
       }
     }
     if (ref_vel < MAX_SPEED) {
-      speed_diff += MAX_ACC;
+      //speed_diff += MAX_ACC;
+      this->acceleration += MAX_ACC;
     }
   }
 
-  ref_vel += speed_diff;
+  //ref_vel += speed_diff;
+  ref_vel += this->acceleration;
 
-  if ( ref_vel > MAX_SPEED ) {
+  if (ref_vel > MAX_SPEED) {
     ref_vel = MAX_SPEED;
   }
 
