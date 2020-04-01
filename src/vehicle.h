@@ -17,7 +17,9 @@ class Vehicle {
 
   double choose_next_lane(double ref_vel);
 
-  //float cost_state(string state);
+  float cost_state(string state);
+
+  void keep_lane(double ref_vela);
 
   // Destructor
   virtual ~Vehicle();
@@ -29,10 +31,10 @@ class Vehicle {
   int lane;
   float s, d, speed, acceleration;
   string state;
-  //bool car_ahead, car_left_ahead, car_left_behind, car_right_ahead, car_right_behind;
-  //float car_ahead_speed, car_left_ahead_speed, car_left_behind_speed, car_right_ahead_speed, car_right_behind_speed;
   bool car_ahead, car_right, car_left;
-  float car_ahead_speed, car_left_ahead_speed, car_left_behind_speed, car_right_ahead_speed, car_right_behind_speed;
+  float car_ahead_speed, car_ahead_distance;
+  float car_left_speed, car_left_distance;
+  float car_right_speed, car_right_distance;
 };
 
 #endif  // VEHICLE_H

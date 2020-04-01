@@ -101,9 +101,9 @@ int main() {
             car_s = end_path_s;
           }
 
-          bool car_ahead = false;
-          bool car_left = false;
-          bool car_right = false;
+          //bool car_ahead = false;
+          //bool car_left = false;
+          //bool car_right = false;
 
           Vehicle ego_car(lane, car_s, car_speed, "CS");
 
@@ -190,7 +190,7 @@ int main() {
             double shift_y = ptsy[i] - ref_y;
 
             ptsx[i] = (shift_x * cos(0-ref_yaw)-shift_y*sin(0-ref_yaw));
-            ptsy[i] = (shift_x * sin(0-ref_yaw)+shift_y*cos(0-ref_yaw)); 
+            ptsy[i] = (shift_x * sin(0-ref_yaw)+shift_y*cos(0-ref_yaw));
           }
 
           // create a spline
