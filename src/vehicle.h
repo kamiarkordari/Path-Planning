@@ -11,7 +11,7 @@ class Vehicle {
  public:
   // Constructors
   Vehicle();
-  Vehicle(int lane, float s, float v, string state="CS");
+  Vehicle(int lane, float s, float speed, string state="CS");
 
   void check_lanes(Vehicle car);
 

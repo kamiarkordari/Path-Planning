@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include <iostream>
+using namespace std;
 using std::string;
 using std::vector;
 using std::min;
@@ -11,7 +13,7 @@ using std::min;
 // Initializes Vehicle
 Vehicle::Vehicle(){}
 
-Vehicle::Vehicle(int lane, float s, float v, string state) {
+Vehicle::Vehicle(int lane, float s, float speed, string state) {
   this->lane = lane;
   this->s = s;
   this->speed = speed;
@@ -42,6 +44,7 @@ void Vehicle::check_lanes(Vehicle car) {
 
     if ((distance < this->car_ahead_distance) && (distance > 0)) {
       this->car_ahead_speed = car.speed;
+      this->car_ahead_distance = distance;
     }
     //this->car_ahead = distance < 2*car.MIN_SAFE_DISTANCE && distance > 0; //(car.s > this->s) && (car.s - this->s < 30);
   } else if (car.lane == this->lane - 1){
@@ -49,38 +52,45 @@ void Vehicle::check_lanes(Vehicle car) {
     this->car_left |= (distance < car.MIN_SAFE_DISTANCE) && (distance > -car.MIN_SAFE_DISTANCE); //(this->s - 30 < car.s) && (this->s + 30 > car.s);
     if ((distance < this->car_left_distance) && (distance > 0)) {
       this->car_left_speed = car.speed;
+      this->car_left_distance = distance;
     }
   } else if (car.lane = this->lane + 1) {
     // Car on the right
     this->car_right |= (distance < car.MIN_SAFE_DISTANCE) && (distance > -car.MIN_SAFE_DISTANCE); //(this->s - 30 < car.s) && (this->s + 30 > car.s);
     if ((distance < this->car_right_distance) && (distance > 0)) {
       this->car_right_speed = car.speed;
+      this->car_right_distance = distance;
     }
   }
 
 }
 
 double Vehicle::choose_next_lane(double ref_vel) {
-  //const double MAX_SPEED = 49.5;
-  //const double MAX_ACC = 0.224;
+  const double MAX_SPEED = 49.5;
+  const double MAX_ACC = 0.224;
 
-  float cost_left = cost_state("CLL");
-  float cost_right = cost_state("CLR");
-  float cost_keep = cost_state("KL");
+  float cost_left = this->cost_state("CLL");
+  float cost_right = this->cost_state("CLR");
+  float cost_keep = this->cost_state("KL");
 
   this->acceleration = 0;
 
+
   float cost_min = min(cost_left, min(cost_right,cost_keep));
 
-  if (cost_left == cost_min) {
-    this->lane--;
+  if (cost_keep == cost_min) {
+    this->keep_lane(ref_vel);
   } else if (cost_right == cost_min) {
     this->lane++;
-  } else {
-    keep_lane(ref_vel);
   }
+/*
+  else {
+    this->keep_lane(ref_vel);
+  }
+*/
 
-  /*
+
+/*
   if (this->car_ahead ) { // Car ahead
     if (!this->car_left && this->lane > 0) {
       // if there is no car left and there is a left lane.
@@ -92,7 +102,11 @@ double Vehicle::choose_next_lane(double ref_vel) {
       //speed_diff -= MAX_ACC;
       this->acceleration -= MAX_ACC;
     }
-  } else {
+  }
+*/
+  else {
+    this->lane--;
+/*
     if (this->lane != 1) { // if we are not on the center lane.
       if ((this->lane == 0 && !this->car_right) || (this->lane == 2 && !this->car_left)) {
         this->lane = 1; // Back to center.
@@ -102,9 +116,9 @@ double Vehicle::choose_next_lane(double ref_vel) {
       //speed_diff += MAX_ACC;
       this->acceleration += MAX_ACC;
     }
-  }
+*/
 
-  */
+  }
 
   ref_vel += this->acceleration;
 
@@ -119,11 +133,11 @@ double Vehicle::choose_next_lane(double ref_vel) {
 void Vehicle::keep_lane(double ref_vel) {
   if (this->car_ahead) {
     // slow down, there is a car ahead
-    this->acceleration = -this->MAX_ACC;
+    this->acceleration -= this->MAX_ACC;
   } else {
     if (ref_vel < this->MAX_SPEED) {
       // speed up, until speed reached to max, there is no car ahead
-      this->acceleration = this->MAX_ACC;
+      this->acceleration += this->MAX_ACC;
     }
   }
 }
@@ -131,6 +145,7 @@ void Vehicle::keep_lane(double ref_vel) {
 
 float Vehicle::cost_state(string state) {
   float lane_speed = 0;
+
   if (state == "CLL") {
     if ((this->lane == 0) || this->car_left) {
       return 1;
@@ -143,15 +158,16 @@ float Vehicle::cost_state(string state) {
     if ((this->lane == 2) || this->car_right) {
       return 1;
     } else {
-      lane_speed = car_right_speed;
+      lane_speed = this->car_right_speed;
     }
   }
 
   if (state == "KL") {
     if (car_ahead) return 1;
   } else {
-    lane_speed = this->MAX_SPEED;
+    lane_speed = this->car_ahead_speed;
   }
 
   return (this->MAX_SPEED - lane_speed)/this->MAX_SPEED;
+
 }
