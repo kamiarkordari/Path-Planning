@@ -85,6 +85,7 @@ int main() {
           // Previous path data given to the Planner
           auto previous_path_x = j[1]["previous_path_x"];
           auto previous_path_y = j[1]["previous_path_y"];
+
           // Previous path's end s and d values
           double end_path_s = j[1]["end_path_s"];
           double end_path_d = j[1]["end_path_d"];
@@ -101,11 +102,8 @@ int main() {
             car_s = end_path_s;
           }
 
-          //bool car_ahead = false;
-          //bool car_left = false;
-          //bool car_right = false;
-
-          Vehicle ego_car(lane, car_s, car_speed, "CS");
+          // create a vehicle object for the ego car
+          Vehicle ego_car(lane, car_s, car_speed);
 
           // loop over other cars
           for (int i = 0; i < sensor_fusion.size(); i++){
@@ -114,21 +112,24 @@ int main() {
             double other_car_s = sensor_fusion[i][5];
             float other_car_d = sensor_fusion[i][6];
 
-            int other_car_lane = get_lane(other_car_d,4);
+            // convert frenet coordinate d to lane number (assumption: lane width is 4 meters)
+            int other_car_lane = GetLane(other_car_d,4);
 
             double other_car_speed = sqrt(other_car_vx*other_car_vx + other_car_vy*other_car_vy);
 
             // position after executing previous trajectory
             other_car_s += ((double)prev_size * 0.02 * other_car_speed);
 
-            Vehicle car(other_car_lane, other_car_s, other_car_speed, "CS");
+            // create a vehicle object for the other car
+            Vehicle car(other_car_lane, other_car_s, other_car_speed);
 
-            ego_car.check_lanes(car);
+            //
+            ego_car.AssessOtherCar(car);
 
           }
 
-          ref_vel = ego_car.choose_next_lane(ref_vel);
-
+          // decide on the next best move: find velocity and lane
+          ref_vel = ego_car.ChooseNextMove(ref_vel);
           lane = ego_car.lane;
 
           // create a list of widely and evenly spaced waypoints at 30m

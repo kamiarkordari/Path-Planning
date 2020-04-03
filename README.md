@@ -6,31 +6,39 @@
 The goal of this project is to build a path planner that creates smooth and safe trajectories for a self-driving car to follow.
 
 ### Goals
-In this project the goal is to safely navigate around a virtual highway with other traffic that is driving +-10 MPH of the 50 MPH speed limit. The planner is provided with the car's localization and sensor fusion data, there is also a sparse map list of waypoints around the highway. The car should try to go as close as possible to the 50 MPH speed limit, which means passing slower traffic when possible. Other cars will try to change lanes too. The car should avoid hitting other cars at all cost as well as driving inside of the marked road lanes at all times, unless going from one lane to another. The car should be able to make one complete loop around the 6946m highway. Since the car is trying to go 50 MPH, it should take a little over 5 minutes to complete 1 loop. Also the car should not experience total acceleration over 10 m/s^2 and jerk that is greater than 10 m/s^3.
+In this project the goal is to safely navigate around a virtual highway with other traffic that is driving +-10 MPH of the 50 MPH speed limit.
+
+Here is a list of our objectives:
+- The car should go as close as possible to the 50 MPH speed limit, which means passing slower traffic when possible.
+- Other cars will try to change lanes too. The car should avoid hitting other cars at all cost.
+- The car should drive inside of the marked road lanes at all times, unless going from one lane to another.
+- The car should be able to make one complete loop around the 6946m highway. This should take about 5 minutes to complete one loop.
+- The car should not experience total acceleration over 10 m/s^2 and jerk that is greater than 10 m/s^3.
 
 ### Path planner
+##### Input
+The planner is provided with these inout data:
+- the car's localization and sensor fusion data
+- a sparse map list of waypoints around the highway
 
-##### Trajectory
-The path planner outputs a list of x and y global map coordinates to the controller. Each pair of x and y coordinates is a point, and all of the points together form a trajectory.
 
-The units for the (x,y) points are in meters.
+##### Output
+The path planner outputs a list of fifty pairs of x and y global coordinates that together form a trajectory.
 
-Every 20 ms the car moves to the next point on the list. The car's new rotation becomes the line between the previous waypoint and the car's new location.
+At each new calculation cycle, the code starts the new path with whatever waypoints from the previous path. Then it appends new waypoints based on new data from the car's sensor fusion information until the new path has 50 total waypoints. This ensures that there is a smooth transition from cycle to cycle.
 
+##### Passing Trajectory to Simulator
 In `main.cpp`, we pass `next_x_vals`, and `next_y_vals` that contains the point of the trajectory to the simulator.
 
-The path planner builds a 50-point path. At each new calculation cycle, the code starts the new path with whatever waypoints from the previous path. Then it appends new waypoints based on new data from the car's sensor fusion information until the new path has 50 total waypoints. This ensures that there is a smooth transition from cycle to cycle.
-
-
+### Considerations
 ##### Latency
 There will be some latency between the simulator running and the path planner returning a path, with optimized code usually its not very long maybe just 1-3 time steps. During this delay the simulator will continue using points that it was last given, because of this its a good idea to store the last used points to have a smooth transition. `previous_path_x`, and `previous_path_y` can be helpful for this transition since they show the last points given to the simulator controller with the processed points already removed. Path planner should either return a path that extends this previous path or make sure to create a new path that has a smooth transition with this last path.
-
 
 ##### Velocity
 The velocity of the car depends on the spacing of the points. Because the car moves to a new waypoint every 20ms, the larger the spacing between points, the faster the car will travel. The speed goal is to have the car traveling at (but not above) the 50 MPH speed limit as often as possible.
 
 ##### Jerk
-The jerk is calculated as the average acceleration over 1 second intervals. In order for the passenger to have an enjoyable ride the total acceleration should not go over 10 m/s^2, also the jerk should not go over 50 m/s^3..
+The jerk is calculated as the average acceleration over 1 second intervals. In order for the passenger to have an enjoyable ride the total acceleration should not go over 10 m/s^2, also the jerk should not go over 50 m/s^3.
 
 We minimize total acceleration and jerk by gradually increasing and decreasing point path spacing based on the `car_speed` variable.
 

@@ -154,7 +154,8 @@ vector<double> getXY(double s, double d, const vector<double> &maps_s,
   return {x,y};
 }
 
-int get_lane(float d, float lane_width) {
+// Transform from Frenet d coordinate to lane number
+int GetLane(float d, float lane_width) {
   // get the lane of a car from it's distance from the middle of the road
   int lane = (int)d/lane_width;
   if (lane < 0) {
