@@ -123,7 +123,7 @@ int main() {
             // create a vehicle object for the other car
             Vehicle car(other_car_lane, other_car_s, other_car_speed);
 
-            //
+            // analyze other car (it's speed, distance, lane) with resect to ego car to help with path planning
             ego_car.AssessOtherCar(car);
 
           }
